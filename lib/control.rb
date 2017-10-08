@@ -6,7 +6,7 @@ require './lib/sentences'
 sentence = Sentences.new
 sentence = "#{sentence.sentence}"
 # Print some information
-puts "Check for Miner"
+puts "Check for Miners"
 # Print a (maybe stupid) sentence
 puts "\n#{sentence}\n"
 puts ""
