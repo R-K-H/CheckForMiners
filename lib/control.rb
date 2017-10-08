@@ -1,6 +1,6 @@
-require './getpage'
-require './searchforcryptominers'
-require './sentences'
+require './lib/getpage'
+require './lib/searchforcryptominers'
+require './lib/sentences'
 
 # Get a new sentence
 sentence = Sentences.new
