@@ -7,9 +7,14 @@ class SearchForCryptoMiners
     @miner =  [
       "https://coinhive.com/lib/coinhive.min.js",
       "https://coin-hive.com/lib/coinhive.min.js",
+      "https://coinhive.com/lib/cryptonight.wasm",
+      "https://coin-hive.com/lib/cryptonight.wasm",
       "https://crypto-loot.com/lib/miner.min.js",
+      "https://ppoi.org/lib/projectpoi.min.js",
       "lib/coinhive.min.js",
-      "lib/miner.min.js"
+      "lib/cryptonight.wasm",
+      "lib/miner.min.js",
+      "lib/projectpoi.min.js"
     ]
     # Convert "code" to an actual string
     code = code.source
