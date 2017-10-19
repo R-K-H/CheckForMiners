@@ -16,7 +16,7 @@ class SearchForCryptoMiners
       "lib/miner.min.js",
       "lib/projectpoi.min.js"
     ]
-    # Convert "code" to an actual string
+    # Get the code variable from the class object
     code = code.source
     # Set the @contains variable to the standard value "false"
     @contains = false
