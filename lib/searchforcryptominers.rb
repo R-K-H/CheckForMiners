@@ -20,7 +20,7 @@ class SearchForCryptoMiners
     code = code.source
     # Set the @contains variable to the standard value "false"
     @contains = false
-    # Check if the code contains "coinhive.com/lib", "coin-hive.com/lib", "crypto-loot.com/lib", "lib/coinhive.min.js"
+    # Check if the code contains "coinhive.com/lib", "coin-hive.com/lib", "crypto-loot.com/lib", "lib/coinhive.min.js", etc.
     if @miner.any? { |check| code.include? check }
       # Set "contains" to true
       @contains = true
