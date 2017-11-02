@@ -2,7 +2,7 @@ class SearchForCryptoMiners
   # Initialize the Array and make it accessable from the outside
   attr_accessor :miner, :contains
   
-  def initialize(code)
+  def initialize(source)
     # Fill the array with data (the miner domains)
     @miner =  [
       "https://coinhive.com/lib/coinhive.min.js",
@@ -16,14 +16,17 @@ class SearchForCryptoMiners
       "lib/miner.min.js",
       "lib/projectpoi.min.js"
     ]
-    # Get the code variable from the class object
-    code = code.source
-    # Set the @contains variable to the standard value "false"
-    @contains = false
-    # Check if the code contains "coinhive.com/lib", "coin-hive.com/lib", "crypto-loot.com/lib", "lib/coinhive.min.js", etc.
-    if @miner.any? { |check| code.include? check }
-      # Set "contains" to true
-      @contains = true
+   
+    if source == nil
+      @contains = 'empty'
+    else
+      # Set the @contains variable to the standard value "false"
+      @contains = false
+      # Check if the code contains "coinhive.com/lib", "coin-hive.com/lib", "crypto-loot.com/lib", "lib/coinhive.min.js", etc.
+      if @miner.any? { |check| source.include? check }
+        # Set "contains" to true
+        @contains = true
+      end
     end
   end
 end

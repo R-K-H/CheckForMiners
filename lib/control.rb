@@ -1,30 +1,57 @@
+require 'mongo'
 require './lib/getpage'
 require './lib/searchforcryptominers'
-require './lib/sentences'
+require './lib/domainsshort'
+require 'typhoeus'
+require 'nokogiri'
+require 'json'
+require 'pp'
+# require './lib/domains'
 
-# Get a new sentence
-sentence = Sentences.new
-sentence = "#{sentence.sentence}"
+client = Mongo::Client.new('mongodb://mongo/domains')
+
+collection = client[:domains]
+
+domains = DomainsShort.domains
 # Print some information
 puts "Check for Miners"
-# Print a (maybe stupid) sentence
-puts "\n#{sentence}\n"
-puts ""
-# Ask the user for typing in the URL
-print "Type in the URL you want to check: "
-# Save the URL in a variable
-url = gets.chomp
-# Get the source code
-source = GetPage.new url
-puts "\nDownloaded the source code of the site"
-# Check if the site uses Coin Hive
-uses = SearchForCryptoMiners.new(source)
-puts "Searched for known crypto miner domains/locations (#{uses.miner.join(", ")})"
-# Check if the variable "uses" is true
-if uses.contains
-  # Print that the site uses Coin Hive
-  puts "\nThe site '#{url}' uses a crypto miner"
-else
-  # Print that the site doesn't use Coin Hive
-  puts "\nThe site '#{url}' doesn't use a crypto miner"
+
+domains.each do |domain|
+	# Get the source code
+
+	doc = { domain: domain }
+	doc[:pages] = []
+
+	domain_info = GetPage.new domain
+
+	if domain_info.source.nil?
+		result = collection.insert_one(doc)
+		puts result.inserted_id.to_s
+		next
+	end
+
+	uses = SearchForCryptoMiners.new domain_info.source
+	doc[:pages] << {
+		url: domain,
+		data: {
+			#source: domain_info.source,
+			miner: uses.contains
+		}
+	}
+
+	domain_info.subpages.each do |page|
+		page_source = GetPage.new page
+		pages_uses = SearchForCryptoMiners.new page_source.source
+
+		doc[:pages] << {
+			url: page,
+			data: {
+				#source: page_source.source,
+				miner: pages_uses.contains
+			}
+		}
+ 	end
+
+	result = collection.insert_one(doc)
+	puts result.inserted_id.to_s
 end
