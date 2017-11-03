@@ -66,7 +66,7 @@ end
 
 # Ger our huge list of domains
 @domains = Domains.domains
-pool = Thread.pool(2)
+pool = Thread.pool(50)
 pt("Check for Miners")
 # For each domain let's go through and do things.
 @domains.each_with_index do |domain, i|
