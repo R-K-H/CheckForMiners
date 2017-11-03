@@ -17,9 +17,6 @@ class SearchForCryptoMiners
       "lib/projectpoi.min.js"
     ]
    
-    if source == nil
-      @contains = 'empty'
-    else
       # Set the @contains variable to the standard value "false"
       @contains = false
       # Check if the code contains "coinhive.com/lib", "coin-hive.com/lib", "crypto-loot.com/lib", "lib/coinhive.min.js", etc.
@@ -28,5 +25,4 @@ class SearchForCryptoMiners
         @contains = true
       end
     end
-  end
 end

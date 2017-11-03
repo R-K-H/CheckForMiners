@@ -1,20 +1,31 @@
 require 'mongo'
 require './lib/getpage'
 require './lib/searchforcryptominers'
-require './lib/domainsshort'
+#require './lib/domainsshort'
 require 'typhoeus'
 require 'nokogiri'
-require 'json'
-require 'pp'
-# require './lib/domains'
+require './lib/domains'
+require 'thread/pool'
+
+Mongo::Logger.logger.level = Logger::FATAL
+
+def pt(what)
+  puts what
+  STDOUT.flush
+end
+
+pool = Thread.pool(4)
+pool.shutdown
+
 
 client = Mongo::Client.new('mongodb://mongo/domains')
 
 collection = client[:domains]
 
-domains = DomainsShort.domains
+domains = Domains.domains
+
 # Print some information
-puts "Check for Miners"
+pt("Check for Miners")
 
 domains.each do |domain|
 	# Get the source code
@@ -26,7 +37,7 @@ domains.each do |domain|
 
 	if domain_info.source.nil?
 		result = collection.insert_one(doc)
-		puts result.inserted_id.to_s
+		pt(result.inserted_id.to_s)
 		next
 	end
 
@@ -38,9 +49,18 @@ domains.each do |domain|
 			miner: uses.contains
 		}
 	}
-
-	domain_info.subpages.each do |page|
+	domain_info.subpages.each_with_index do |page, i|
+		if i > 40000
 		page_source = GetPage.new page
+		if page_source.source.nil?
+			doc[:pages] << {
+				url: page,
+				data: {}
+			}
+			result = collection.insert_one(doc)
+			pt(result.inserted_id.to_s)
+			next
+		end
 		pages_uses = SearchForCryptoMiners.new page_source.source
 
 		doc[:pages] << {
@@ -53,5 +73,6 @@ domains.each do |domain|
  	end
 
 	result = collection.insert_one(doc)
-	puts result.inserted_id.to_s
+	pt(result.inserted_id.to_s)
 end
+
