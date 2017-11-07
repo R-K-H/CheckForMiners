@@ -13,6 +13,13 @@ class SearchForCryptoMiners
       "coin-hive.com/lib/cryptonight.wasm",
       "crypto-loot.com/lib/miner.min.js",
       "ppoi.org/lib/projectpoi.min.js",
+      "coinhive.min.js",
+      "cryptonight.wasm",
+      "miner.min.js",
+      "coin-hive",
+      "ppoi.org",
+      "cryptonight",
+      "projectpoi.min.js",
       "lib/coinhive.min.js",
       "lib/cryptonight.wasm",
       "lib/miner.min.js",
@@ -28,6 +35,7 @@ class SearchForCryptoMiners
       "load.jsecoin.com",
       "static.reasedoper.pw",
       "mataharirama.xyz",
+      "jsecoin.com",
       "listat.biz",
       "lmodr.biz",
       "minecrunch.co/web",
@@ -55,7 +63,12 @@ class SearchForCryptoMiners
       "monerominer.rocks/miner.php",
       "cdn.cloudcoins.co/javascript/cloudcoins.min.js",
       "coinlab.biz/lib/coinlab.js",
-      'cnhv.co'
+      "cnhv.co",
+      "coinlab.js",
+      "miner.js",
+      "cloudcoins.min.js",
+      "c-hive.js",
+      "xmr.min.js"
     ]
    
       # Set the @contains variable to the standard value "false"

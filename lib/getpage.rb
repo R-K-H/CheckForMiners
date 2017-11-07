@@ -5,7 +5,7 @@ class GetPage
     attr_accessor :source, :subpages, :error, :url
     def initialize(domain)
     	@url = domain
-		request = Typhoeus::Request.new("#{domain}", headers: {"User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"}, followlocation: true, timeout: 40, ssl_verifypeer: false, ssl_verifyhost: 0)
+		request = Typhoeus::Request.new("#{domain}", headers: {"User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"}, followlocation: true, timeout: 10, ssl_verifypeer: false, ssl_verifyhost: 0)
 
 		request.on_complete do |response|
 		  if response.success?
