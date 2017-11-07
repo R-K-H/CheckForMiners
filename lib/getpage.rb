@@ -1,32 +1,36 @@
-require 'resolv-replace'
-require 'net/http'
-require 'uri'
-require 'open-uri' 
 require 'typhoeus'
 require 'nokogiri'
 
 class GetPage
-    attr_accessor :source, :subpages
+    attr_accessor :source, :subpages, :error, :url
     def initialize(domain)
-		request = Typhoeus::Request.new("#{domain}", followlocation: true, timeout: 10, ssl_verifypeer: false, ssl_verifyhost: 0)
+    	@url = domain
+		request = Typhoeus::Request.new("#{domain}", headers: {"User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"}, followlocation: true, timeout: 10, ssl_verifypeer: false, ssl_verifyhost: 0)
 
 		request.on_complete do |response|
 		  if response.success?
 		  	subpages = []
-		  	page = Nokogiri::HTML(response.body)
+		  	page = Nokogiri::HTML(response.body, nil, Encoding::UTF_8.to_s)
+		  	
+		  	# Find three subpages
 		  	links = page.css("a").select{|link| link['href'] =~ /^(https?):\/\/(www\.)?#{domain}\//ix}
-			links.take(3).each{|link| subpages << link['href'] }
-			@subpages = subpages
+			links.each{|link| subpages << link['href'] }
+			if(subpages.length >= 3)
+				@subpages = subpages.sample(3)
+			else
+				@subpages = subpages
+			end
 		    @source = response.body.to_s
+		    @error = nil
 		  elsif response.timed_out?
 		    # aw hell no
-		    puts "got a time out"
+		    @error = "got a time out"
 		  elsif response.code == 0
 		    # Could not get an http response, something's wrong.
-		    puts response.return_message
+		    @error = response.return_message
 		  else
 		    # Received a non-successful http response.
-		    puts "HTTP request failed: " + response.code.to_s
+		    @error = "HTTP request failed: " + response.code.to_s
 		  end
 		end
 

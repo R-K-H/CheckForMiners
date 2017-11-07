@@ -1,13 +1,13 @@
 require 'mongo'
 require './lib/getpage'
 require './lib/searchforcryptominers'
-#require './lib/domainsshort'
-require 'typhoeus'
-require 'nokogiri'
 require './lib/domains'
 require 'thread/pool'
 
+# Tell it to shutup
 Mongo::Logger.logger.level = Logger::FATAL
+
+# Our mongo db 
 client = Mongo::Client.new('mongodb://mongo/domains')
 @collection = client[:domains]
 
@@ -16,49 +16,59 @@ def pt(what)
   STDOUT.flush
 end
 
-def getCracking(domain, pool)
-	pt(domain.to_s + " starting")
-	doc = { domain: domain }
-	doc[:pages] = []
+def buildDocument(domain, doc)
+	unless domain.error.nil?
+		doc[:errors] << {
+			error: domain.error
+		}
+	end
+	
+	if domain.source.nil?
+		# Add to our document
+		doc[:pages] << {
+			url: domain.url,
+			data: nil
+		}
+	else
+		# Search
+		uses = SearchForCryptoMiners.new domain.source
 
-	domain_info = GetPage.new domain
-
-	if domain_info.source.nil?
-		result = @collection.insert_one(doc)
-		pt(result.inserted_id.to_s)
-		return
+		# add to our document
+		doc[:pages] << {
+			url: domain.url,
+			data: {
+				miner: uses.contains
+			}
+		}
 	end
 
-	uses = SearchForCryptoMiners.new domain_info.source
-	doc[:pages] << {
-		url: domain,
-		data: {
-			#source: domain_info.source,
-			miner: uses.contains
-		}
-	}
-	domain_info.subpages.each do |page|
-		page_source = GetPage.new page
-		if page_source.source.nil?
-			doc[:pages] << {
-				url: page,
-				data: {}
-			}
-			result = @collection.insert_one(doc)
-			pt(result.inserted_id.to_s)
-			return
-		end
-		pages_uses = SearchForCryptoMiners.new page_source.source
+	return doc
+end
 
-		doc[:pages] << {
-			url: page,
-			data: {
-				#source: page_source.source,
-				miner: pages_uses.contains
-			}
-		}
- 	end
+def fetchDomains(domain)
+	# Output a starting
+	pt(domain.to_s + " starting")
 
+	# Begin building our mongo document
+	doc = { domain: domain }
+
+	# Multi page array
+	doc[:pages] = []
+	doc[:errors] = []
+
+	# Fetch our page info and return domain object (source and sub pages)
+	domain_info = GetPage.new domain
+
+	doc = buildDocument(domain_info, doc)
+
+	if(domain_info.subpages.kind_of?(Array))
+		# Go through subpages
+		domain_info.subpages.each do |page|
+
+			page_source = GetPage.new page
+			doc = buildDocument(page_source, doc)
+	 	end
+	end
 	result = @collection.insert_one(doc)
 	pt(result.inserted_id.to_s)
 	return
@@ -66,13 +76,15 @@ end
 
 # Ger our huge list of domains
 @domains = Domains.domains
-pool = Thread.pool(50)
-pt("Check for Miners")
+
+# Setup for "fake" multithread in ruby
+pool = Thread.pool(15000)
+
 # For each domain let's go through and do things.
 @domains.each_with_index do |domain, i|
 	pool.process {
-		getCracking(domain, pool)
+		fetchDomains(domain)
 	}
-
 end
+
 pool.shutdown
