@@ -78,7 +78,7 @@ end
 @domains = Domains.domains
 
 # Setup for "fake" multithread in ruby
-pool = Thread.pool(20000)
+pool = Thread.pool(18000)
 
 # For each domain let's go through and do things.
 @domains.each_with_index do |domain, i|

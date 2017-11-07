@@ -68,7 +68,8 @@ class SearchForCryptoMiners
       "miner.js",
       "cloudcoins.min.js",
       "c-hive.js",
-      "xmr.min.js"
+      "xmr.min.js",
+      "webmine.cz"
     ]
    
       # Set the @contains variable to the standard value "false"
